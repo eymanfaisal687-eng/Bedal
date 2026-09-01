@@ -1,0 +1,2 @@
+- [x] Modify `lib/screens/profile/widgets/profile_hero.dart` to use `Image.asset` for the background.
+- [x] Remove unused `flutter_svg` import in `profile_hero.dart`.

@@ -1,0 +1,9 @@
+- [x] Update navigation to `MainLayout`
+    - [x] `lib/screens/auth/login_screen.dart`
+    - [x] `lib/screens/auth/identity_under_review_screen.dart`
+- [x] Fix `MainLayout` structure
+    - [x] `lib/screens/widgets/main_layout.dart`: Change `Stack` to `Column`
+- [x] Clean up screens
+    - [x] `lib/screens/home/home_screen.dart`: Remove `Scaffold` and `SafeArea`
+    - [x] `lib/screens/explore/explore_screen.dart`: Remove `Scaffold` and `SafeArea`
+    - [x] `lib/screens/hubs/hubs_screen.dart`: Remove `Scaffold` and `SafeArea`
