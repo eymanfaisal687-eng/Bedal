@@ -1,4 +1,4 @@
-# bedal
+# Bedal
 
 A new Flutter project.
 
