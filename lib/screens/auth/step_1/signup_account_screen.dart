@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bedal/screens/auth/step_2/security_check_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:bedal/providers/signup_provider.dart';
+import 'package:bedal/screens/auth/step_3/category_selection_screen.dart';
 import 'package:bedal/screens/auth/login/login_screen.dart';
 
 // ==========================================
@@ -42,7 +44,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
   final _invitationCodeController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _securityAnswerController = TextEditingController();
 
   // ===========================================================
   //                     FORM STATE
@@ -52,21 +53,13 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
   bool _isButtonPressed = false;
 
   String? _selectedAge;
-  String? _selectedSecurityQuestion;
   double _passwordStrength = 0.0;
 
   // ===========================================================
   //                   DROPDOWN DATA
   // ===========================================================
   static const List<String> _ageOptions = ['18-24', '25-34', '35-44', '45+'];
-
-  static const List<String> _securityQuestions = [
-    'What was the name of your first\nelementary school?',
-    'In what city did your parents first meet?',
-    'What was the name of your very first\nchildhood pet?',
-    'What was the model of your family’s\nvery first car?',
-    'What is the name of your favorite\nchildhood teacher?',
-  ];
+  static const List<String> _nationalityOptions = ['Saudi', 'Pakistani'];
 
   @override
   void initState() {
@@ -82,7 +75,6 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
     _invitationCodeController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _securityAnswerController.dispose();
     super.dispose();
   }
 
@@ -110,12 +102,12 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
       return;
     }
 
-    debugPrint('Form validated successfully. Navigating to Security Check.');
+    debugPrint('Form validated successfully. Navigating to Category Selection.');
     if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SecurityCheckScreen(
+        builder: (_) => CategorySelectionScreen(
           registeredName: _fullNameController.text.trim(),
         ),
       ),
@@ -127,15 +119,14 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark, // Dark icons for white background
-        statusBarBrightness: Brightness.light, // For iOS
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
           child: Stack(
             children: [
-              // Background Image - Now contained within SafeArea so it starts below status bar
               Positioned.fill(
                 child: Container(color: Colors.white),
               ),
@@ -167,8 +158,9 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                               _buildHeader(),
                               const SizedBox(height: 32),
                               _buildAccountInformationSection(),
-                              const SizedBox(height: 40),
-                              _buildRecoverySection(),
+                              const SizedBox(height: 36),
+                              _buildContinueButton(),
+                              const SizedBox(height: 16),
                               _buildFooter(),
                             ],
                           ),
@@ -233,6 +225,8 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
   }
 
   Widget _buildAccountInformationSection() {
+    final signupProvider = context.watch<SignupProvider>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -243,6 +237,7 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
           hintText: 'Invitation / Access Code (Optional)',
           prefixIcon: Icons.confirmation_number_outlined,
           helperText: 'Leave blank to join the Jeddah Campus Waitlist.',
+          onChanged: (value) => context.read<SignupProvider>().updateInvitationCode(value),
         ),
         const SizedBox(height: 22),
         AppTextField(
@@ -250,18 +245,20 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
           hintText: 'Full Name',
           prefixIcon: Icons.person_outline,
           helperText: 'As written on your official ID passport or card',
+          onChanged: (value) => context.read<SignupProvider>().updateFullName(value),
           validator: (value) => (value == null || value.trim().isEmpty)
               ? 'Please enter your full name'
               : null,
         ),
         const SizedBox(height: 22),
+
+        // 1. Email
         AppTextField(
           controller: _emailController,
           hintText: 'Email Address',
           prefixIcon: Icons.email_outlined,
           keyboardType: TextInputType.emailAddress,
-          helperText:
-              'Used as your permanent recovery key if you lose your credentials.',
+          helperText: 'Used as your permanent recovery key if you lose your credentials.',
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Please enter your email address';
@@ -274,6 +271,14 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
           },
         ),
         const SizedBox(height: 22),
+
+        // 2. Password
+        _buildPasswordField(),
+        const SizedBox(height: 22),
+        _buildConfirmPasswordField(),
+        const SizedBox(height: 22),
+
+        // 3. Age (in dropdown way)
         AppDropdownField<String>(
           value: _selectedAge,
           hintText: 'Select your age range',
@@ -290,42 +295,89 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
             ),
           ),
           onChanged: (value) => setState(() => _selectedAge = value),
-          validator: (value) =>
-              value == null ? 'Please select your age group' : null,
+          validator: (value) => value == null ? 'Please select your age group' : null,
         ),
         const SizedBox(height: 22),
-        _buildPasswordField(),
-        const SizedBox(height: 22),
-        _buildConfirmPasswordField(),
-      ],
-    );
-  }
 
-  Widget _buildRecoverySection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const AppSectionTitle(title: 'ACCOUNT RECOVERY SETUP'),
-        const SizedBox(height: 20),
-        _buildSecurityQuestionDropdown(),
-        const SizedBox(height: 18),
-        AppTextField(
-          controller: _securityAnswerController,
-          hintText: 'Type your secure answer here...',
-          prefixIcon: Icons.vpn_key_outlined,
-          prefixIconColor: kRecoveryTextColor,
-          customBorderSide: const BorderSide(
-            width: 1,
-            color: kRecoveryBorderColor,
+        // 4. Nationality (in dropdown way)
+        AppDropdownField<String>(
+          value: signupProvider.nationality.isNotEmpty ? signupProvider.nationality : null,
+          hintText: 'Select your nationality',
+          prefixIcon: Icons.flag_outlined,
+          prefixIconColor: kHelperTextColor,
+          options: _nationalityOptions,
+          helperText: 'Determines your 3D character avatar',
+          itemBuilder: (nat) => Text(
+            nat,
+            style: const TextStyle(
+              color: kTextColor,
+              fontFamily: kPlusJakartaSans,
+              fontSize: 15,
+            ),
           ),
-          helperText:
-              'This answer string is encrypted and fully case-insensitive.',
-          validator: (value) => (value == null || value.trim().isEmpty)
-              ? 'Please provide a secure private answer'
-              : null,
+          onChanged: (value) {
+            if (value != null) {
+              context.read<SignupProvider>().updateNationality(value);
+            }
+          },
+          validator: (value) => value == null ? 'Please select your nationality' : null,
         ),
-        const SizedBox(height: 36),
-        _buildContinueButton(),
+        const SizedBox(height: 22),
+
+        // 5. Gender (last field)
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 8),
+          child: Text('Gender', style: TextStyle(color: kRecoveryTextColor, fontSize: 13, fontWeight: FontWeight.bold)),
+        ),
+        Row(
+          children: ['Man', 'Woman'].map((gender) {
+            final isSelected = signupProvider.gender == gender;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: gender == 'Man' ? 6 : 0, left: gender == 'Woman' ? 6 : 0),
+                child: GestureDetector(
+                  onTap: () => context.read<SignupProvider>().updateGender(gender),
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [kPrimaryColor, kSecondaryColor],
+                            )
+                          : null,
+                      color: isSelected ? null : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected ? kPrimaryColor : kRecoveryBorderColor,
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        if (isSelected)
+                          BoxShadow(
+                            color: kPrimaryColor.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      gender,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : kTextColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        fontFamily: kPlusJakartaSans,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ],
     );
   }
@@ -433,104 +485,81 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
     );
   }
 
-  Widget _buildSecurityQuestionDropdown() {
+  Widget _buildContinueButton() {
+    final signupProvider = context.watch<SignupProvider>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 12, bottom: 8),
-          child: Text(
-            'Select Security Question',
-            style: TextStyle(
-              color: kRecoveryTextColor,
-              fontSize: 14,
-              fontFamily: kPlusJakartaSans,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        AppDropdownField(
-          value: _selectedSecurityQuestion,
-          hintText: 'Choose a recovery prompt question',
-          prefixIcon: Icons.help_outline,
-          prefixIconColor: kRecoveryTextColor,
-          customBorderSide: const BorderSide(
-            width: 1,
-            color: kRecoveryBorderColor,
-          ),
-          options: _securityQuestions,
-          isSearchable: true,
-          searchDialogTitle: 'Search Security Questions',
-          itemBuilder: (q) => Text(
-            q,
-            style: const TextStyle(
-              color: kTextColor,
-              fontFamily: kPlusJakartaSans,
-              fontSize: 14,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-          onChanged: (value) =>
-              setState(() => _selectedSecurityQuestion = value),
-          validator: (value) => value == null
-              ? 'Please select a recovery security question'
-              : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildContinueButton() {
-    return TweenAnimationBuilder(
-      tween: Tween(begin: 1.0, end: _isButtonPressed ? 0.96 : 1.0),
-      duration: const Duration(milliseconds: 100),
-      builder: (context, scale, child) {
-        return Transform.scale(scale: scale, child: child);
-      },
-      child: InkWell(
-        onTap: _handleContinue,
-        borderRadius: BorderRadius.circular(16),
-        child: Container(
-          width: double.infinity,
-          height: 56,
-          decoration: ShapeDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [kPrimaryColor, kSecondaryColor],
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            shadows: const [
-              BoxShadow(
-                color: Color(0x1F000000),
-                blurRadius: 8,
-                offset: Offset(0, 4),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          alignment: Alignment.center,
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Continue',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontFamily: kPlusJakartaSans,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
+        TweenAnimationBuilder(
+          tween: Tween(begin: 1.0, end: _isButtonPressed ? 0.96 : 1.0),
+          duration: const Duration(milliseconds: 100),
+          builder: (context, scale, child) {
+            return Transform.scale(scale: scale, child: child);
+          },
+          child: InkWell(
+            onTap: () {
+              bool isValidCode = context.read<SignupProvider>().verifyInvitationCode();
+              if (isValidCode) {
+                context.read<SignupProvider>().clearError();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Code Verified! Initializing Account...')),
+                );
+                _handleContinue();
+              }
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              width: double.infinity,
+              height: 56,
+              decoration: ShapeDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [kPrimaryColor, kSecondaryColor],
                 ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                shadows: const [
+                  BoxShadow(
+                    color: Color(0x1F000000),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                    spreadRadius: -2,
+                  ),
+                ],
               ),
-              SizedBox(width: 8),
-              Icon(Icons.arrow_forward, color: Colors.white, size: 18),
-            ],
+              alignment: Alignment.center,
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Continue',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontFamily: kPlusJakartaSans,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+        if (signupProvider.errorMessage.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              signupProvider.errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+            ),
+          ),
+      ],
     );
   }
 
@@ -596,7 +625,7 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
                   ),
                 ),
                 const Text(
-                  'Step 1 of 3',
+                  'Step 2 of 3',
                   style: TextStyle(
                     color: kPrimaryColor,
                     fontSize: 14,
@@ -608,7 +637,7 @@ class _SignupAccountScreenState extends State<SignupAccountScreen> {
             ),
           ),
           const LinearProgressIndicator(
-            value: 0.33,
+            value: 0.66,
             backgroundColor: kBorderColor,
             color: kPrimaryColor,
             minHeight: 2,
@@ -657,6 +686,7 @@ class AppTextField extends StatelessWidget {
   final String? helperText;
   final BorderSide? customBorderSide;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
 
   const AppTextField({
     super.key,
@@ -670,6 +700,7 @@ class AppTextField extends StatelessWidget {
     this.helperText,
     this.customBorderSide,
     this.validator,
+    this.onChanged,
   });
 
   @override
@@ -709,7 +740,10 @@ class AppTextField extends StatelessWidget {
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onChanged: fieldState.didChange,
+                onChanged: (value) {
+                  fieldState.didChange(value);
+                  onChanged?.call(value);
+                },
               ),
             ),
             AnimatedSize(
@@ -1088,12 +1122,11 @@ class FormFieldBoxContainer extends StatelessWidget {
           side:
               customBorderSide ??
               const BorderSide(width: 1, color: Color(0xFFE8E8E8)),
-          // Subtle beige/gray border
           borderRadius: BorderRadius.circular(16),
         ),
         shadows: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02), // Very soft shadow
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

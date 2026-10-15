@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -25,8 +26,6 @@ class BottomNavBar extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: background,
-
-        // Very subtle separation from the page
         border: Border(
           top: BorderSide(
             color: border,
@@ -34,151 +33,65 @@ class BottomNavBar extends StatelessWidget {
           ),
         ),
       ),
-
       padding: const EdgeInsets.symmetric(
         vertical: 10,
         horizontal: 10,
       ),
-
       child: SafeArea(
         top: false,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
           children: [
-            // =======================================================
-            // HOME
-            // =======================================================
-
-            _buildAnimatedNavItem(
-              0,
-              Icons.home_outlined,
-              Icons.home,
-              'Home',
-            ),
-
-            // =======================================================
-            // EXPLORE
-            // =======================================================
-
-            _buildAnimatedNavItem(
-              1,
-              Icons.explore_outlined,
-              Icons.explore,
-              'Explore',
-            ),
-
-            // =======================================================
-            // HUBS
-            // =======================================================
-
-            _buildAnimatedNavItem(
-              2,
-              Icons.coffee_outlined,
-              Icons.coffee,
-              'Hubs',
-            ),
-
-            // =======================================================
-            // CHAT
-            // =======================================================
-
-            _buildAnimatedNavItem(
-              3,
-              Icons.chat_bubble_outline,
-              Icons.chat_bubble,
-              'Chat',
-            ),
-
-            // =======================================================
-            // PROFILE
-            // =======================================================
-
-            _buildAnimatedNavItem(
-              4,
-              Icons.person_outline,
-              Icons.person,
-              'Profile',
-            ),
+            _buildAnimatedNavItem(0, Icons.home_outlined, Icons.home, 'Home'),
+            _buildAnimatedNavItem(1, Icons.explore_outlined, Icons.explore, 'Explore'),
+            _buildAnimatedNavItem(2, Icons.coffee_outlined, Icons.coffee, 'Hubs'),
+            _buildAnimatedNavItem(3, Icons.chat_bubble_outline, Icons.chat_bubble, 'Chat'),
+            _buildAnimatedNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
           ],
         ),
       ),
     );
   }
 
-  // ===============================================================
-  // ANIMATED NAVIGATION ITEM
-  // ===============================================================
-
-  Widget _buildAnimatedNavItem(int index,
-      IconData inactiveIcon,
-      IconData activeIcon,
-      String label,) {
+  Widget _buildAnimatedNavItem(
+    int index,
+    IconData inactiveIcon,
+    IconData activeIcon,
+    String label,
+  ) {
     final bool isActive = currentIndex == index;
 
     return GestureDetector(
-      onTap: () => onTap(index),
-
+      onTap: () {
+        HapticFeedback.lightImpact(); // Tactile haptic feedback on tab switch
+        onTap(index);
+      },
       child: AnimatedContainer(
-        duration: const Duration(
-          milliseconds: 300,
-        ),
-
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-
         padding: const EdgeInsets.symmetric(
           horizontal: 14,
           vertical: 8,
         ),
-
         decoration: BoxDecoration(
-          // =========================================================
-          // ACTIVE CAPSULE
-          // =========================================================
-
-          color: isActive
-              ? activeBackground
-              : Colors.transparent,
-
+          color: isActive ? activeBackground : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
-
         child: Row(
           mainAxisSize: MainAxisSize.min,
-
           children: [
-            // =======================================================
-            // ICON
-            // =======================================================
-
             Icon(
-              isActive
-                  ? activeIcon
-                  : inactiveIcon,
-
-              color: isActive
-                  ? gold
-                  : inactive,
-
+              isActive ? activeIcon : inactiveIcon,
+              color: isActive ? gold : inactive,
               size: 22,
             ),
-
-            // =======================================================
-            // ANIMATED LABEL
-            // =======================================================
-
             AnimatedCrossFade(
-              duration: const Duration(
-                milliseconds: 250,
-              ),
-
+              duration: const Duration(milliseconds: 250),
               firstChild: Row(
                 children: [
                   const SizedBox(width: 6),
-
                   Text(
                     label,
-
                     style: const TextStyle(
                       color: gold,
                       fontSize: 12,
@@ -188,9 +101,7 @@ class BottomNavBar extends StatelessWidget {
                   ),
                 ],
               ),
-
               secondChild: const SizedBox.shrink(),
-
               crossFadeState: isActive
                   ? CrossFadeState.showFirst
                   : CrossFadeState.showSecond,

@@ -6,6 +6,7 @@ import 'widgets/search/search_bar.dart';
 import 'widgets/search/search_results.dart';
 import 'widgets/trending/trending_skills_section.dart';
 import 'widgets/workshops/group_workshops_section.dart';
+import 'widgets/workshops/redeem_workshops_section.dart';
 
 enum ExploreMode {
   mentor,
@@ -14,25 +15,6 @@ enum ExploreMode {
 
 // ============================================================================
 // BEDAL — EXPLORE SCREEN
-// ============================================================================
-//
-// Purpose:
-// Premium discovery space for finding people, skills, and workshops.
-//
-// Visual direction:
-// • Bedal Gold        #C5A059
-// • Deep Charcoal     #16171A
-// • Warm Surface      #25231F
-// • Soft Cream        #F8F5EF
-// • White typography
-//
-// Structure:
-// 1. Search
-// 2. Mentor / Learner discovery switch
-// 3. Contextual discovery message
-// 4. People
-// 5. Trending skills
-// 6. Workshops & guilds
 // ============================================================================
 
 class ExploreScreen extends StatefulWidget {
@@ -45,88 +27,108 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   ExploreMode _exploreMode = ExploreMode.mentor;
   String _searchQuery = '';
-
-  // ==========================================================================
-  // BEDAL COLORS
-  // ==========================================================================
+  double _dragExtent = 0.0;
 
   static const Color darkHeader = Color(0xFFF1EEE7);
   static const Color greigeBg = Color(0xFFF1EEE7);
 
-  // ==========================================================================
-  // BUILD
-  // ==========================================================================
+  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
+    setState(() {
+      _dragExtent += details.delta.dx;
+    });
+  }
+
+  void _handleHorizontalDragEnd(DragEndDetails details) {
+    if (_dragExtent < -40 || details.velocity.pixelsPerSecond.dx < -300) {
+      setState(() {
+        _exploreMode = ExploreMode.learner;
+      });
+    } else if (_dragExtent > 40 || details.velocity.pixelsPerSecond.dx > 300) {
+      setState(() {
+        _exploreMode = ExploreMode.mentor;
+      });
+    }
+    setState(() {
+      _dragExtent = 0.0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: greigeBg,
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ----------------------------------------------------------------
-            // TOP HEADER STRIP (Matches App Header)
-            // ----------------------------------------------------------------
-            Container(
-              height: 12,
-              color: darkHeader,
-              width: double.infinity,
-            ),
-
-            const SizedBox(height: 16),
-
-            // ----------------------------------------------------------------
-            // 1. SEARCH (Now on Greige background)
-            // ----------------------------------------------------------------
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ExploreSearchBar(
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                  });
-                },
+    return GestureDetector(
+      onHorizontalDragUpdate: _handleHorizontalDragUpdate,
+      onHorizontalDragEnd: _handleHorizontalDragEnd,
+      child: Container(
+        color: greigeBg,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ----------------------------------------------------------------
+              // TOP HEADER STRIP
+              // ----------------------------------------------------------------
+              Container(
+                height: 12,
+                color: darkHeader,
+                width: double.infinity,
               ),
-            ),
 
-            const SizedBox(height: 18),
+              const SizedBox(height: 16),
 
-            // ----------------------------------------------------------------
-            // 2. DISCOVERY MODE & HINT
-            // ----------------------------------------------------------------
+              // ----------------------------------------------------------------
+              // 1. SEARCH
+              // ----------------------------------------------------------------
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ExploreToggle(
-                selectedMode: _exploreMode,
-                onChanged: (mode) {
-                  setState(() {
-                    _exploreMode = mode;
-                  });
-                },
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ExploreSearchBar(
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
-            // ----------------------------------------------------------------
-            // 4. PEOPLE / LEADERBOARD / SEARCH RESULTS
-            // ----------------------------------------------------------------
+              // ----------------------------------------------------------------
+              // 2. DISCOVERY MODE & HINT (Supports full-screen horizontal swipe)
+              // ----------------------------------------------------------------
 
-            if (_searchQuery.trim().isEmpty) ...[
-              LeaderboardSection(selectedMode: _exploreMode),
-              _buildSectionDivider(),
-              const TrendingSkillsSection(),
-              _buildSectionDivider(),
-              const GroupWorkshopsSection(),
-            ] else
-              SearchResults(query: _searchQuery, mode: _exploreMode),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ExploreToggle(
+                  selectedMode: _exploreMode,
+                  onChanged: (mode) {
+                    setState(() {
+                      _exploreMode = mode;
+                    });
+                  },
+                ),
+              ),
 
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 20),
+
+              // ----------------------------------------------------------------
+              // 4. PEOPLE / LEADERBOARD / SEARCH RESULTS
+              // ----------------------------------------------------------------
+
+              if (_searchQuery.trim().isEmpty) ...[
+                LeaderboardSection(selectedMode: _exploreMode),
+                _buildSectionDivider(),
+                const TrendingSkillsSection(),
+                _buildSectionDivider(),
+                const GroupWorkshopsSection(),
+                _buildSectionDivider(),
+                const RedeemWorkshopsSection(),
+              ] else
+                SearchResults(query: _searchQuery, mode: _exploreMode),
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );

@@ -76,7 +76,7 @@ class SkillDetailScreen extends StatelessWidget {
                   location: 'Al Rawdah, Jeddah',
                   rating: 4.9,
                   bedalHours: 12 + index * 5,
-                  actionLabel: 'Learn / Connect',
+                  actionLabel: 'Learn',
                   onAction: () {},
                 );
               },
@@ -104,7 +104,7 @@ class SkillDetailScreen extends StatelessWidget {
                   imageUrl: 'https://picsum.photos/seed/learn$index/200/200',
                   location: 'Al Hamra, Jeddah',
                   subtitle: 'Looking for intermediate $skillName tips',
-                  actionLabel: 'Connect / Offer Skill',
+                  actionLabel: 'Offer Skill',
                   onAction: () {},
                 );
               },

@@ -1,7 +1,18 @@
 import 'package:flutter/material.dart';
+import '../my_schedule_screen.dart';
+import '../public_schedule_screen.dart';
 
 class ProfileActions extends StatefulWidget {
-  const ProfileActions({super.key});
+  final bool isMyProfile;
+  final String userId;
+  final String userName;
+
+  const ProfileActions({
+    super.key,
+    this.isMyProfile = true,
+    this.userId = 'other_user',
+    this.userName = 'Ahmed',
+  });
 
   @override
   State<ProfileActions> createState() => _ProfileActionsState();
@@ -24,66 +35,113 @@ class _ProfileActionsState extends State<ProfileActions> {
         22,
         20,
       ),
-      child: Row(
-        children: [
-          // =========================================================
-          // INVITE 1:1
-          // =========================================================
+      child: widget.isMyProfile
+          ? Row(
+              children: [
+                // =========================================================
+                // MY SCHEDULE & CALENDAR (My Profile Only)
+                // =========================================================
+                Expanded(
+                  child: _ActionButton(
+                    label: 'My Schedule',
+                    icon: Icons.calendar_month_rounded,
+                    backgroundColor: gold,
+                    foregroundColor: Colors.white,
+                    isPrimary: true,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const MyScheduleScreen()),
+                      );
+                    },
+                  ),
+                ),
 
-          Expanded(
-            child: _ActionButton(
-              label: 'Invite 1:1',
-              icon: Icons.person_add_alt_1_rounded,
-              backgroundColor: gold,
-              foregroundColor: Colors.white,
-              isPrimary: true,
-              onTap: () {
-                _showInviteSheet(context);
-              },
+                const SizedBox(width: 10),
+
+                // =========================================================
+                // ENTER MY CAFÉ
+                // =========================================================
+                Expanded(
+                  child: _ActionButton(
+                    label: 'Enter My Café',
+                    icon: Icons.local_cafe_rounded,
+                    backgroundColor: Colors.white,
+                    foregroundColor: dark,
+                    isPrimary: false,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Opening your Café ☕'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                // =========================================================
+                // INVITE 1:1
+                // =========================================================
+                Expanded(
+                  child: _ActionButton(
+                    label: 'Invite 1:1',
+                    icon: Icons.person_add_alt_1_rounded,
+                    backgroundColor: gold,
+                    foregroundColor: Colors.white,
+                    isPrimary: true,
+                    onTap: () {
+                      _showInviteSheet(context);
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 6),
+
+                // =========================================================
+                // SCHEDULE MEETUP (Public visitor booking)
+                // =========================================================
+                Expanded(
+                  child: _ActionButton(
+                    label: 'Schedule',
+                    icon: Icons.event_available_rounded,
+                    backgroundColor: Colors.white,
+                    foregroundColor: dark,
+                    isPrimary: false,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PublicScheduleScreen(
+                            hostUserId: widget.userId,
+                            hostUserName: widget.userName,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(width: 6),
+
+                // =========================================================
+                // FOLLOW
+                // =========================================================
+                _FollowButton(
+                  isFollowing: isFollowing,
+                  onTap: () {
+                    setState(() {
+                      isFollowing = !isFollowing;
+                    });
+                  },
+                ),
+              ],
             ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // =========================================================
-          // ENTER MY CAFÉ
-          // =========================================================
-
-          Expanded(
-            child: _ActionButton(
-              label: 'Enter My Café',
-              icon: Icons.local_cafe_rounded,
-              backgroundColor: Colors.white,
-              foregroundColor: dark,
-              isPrimary: false,
-              onTap: () {
-                _enterCafe(context);
-              },
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          // =========================================================
-          // FOLLOW
-          // =========================================================
-
-          _FollowButton(
-            isFollowing: isFollowing,
-            onTap: () {
-              setState(() {
-                isFollowing = !isFollowing;
-              });
-            },
-          ),
-        ],
-      ),
     );
   }
-
-  // =================================================================
-  // INVITE SHEET
-  // =================================================================
 
   void _showInviteSheet(BuildContext context) {
     showModalBottomSheet(
@@ -92,22 +150,14 @@ class _ProfileActionsState extends State<ProfileActions> {
       isScrollControlled: true,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(
-            22,
-            14,
-            22,
-            30,
-          ),
+          padding: const EdgeInsets.fromLTRB(22, 14, 22, 30),
           decoration: const BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(28),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle
               Container(
                 width: 42,
                 height: 4,
@@ -116,10 +166,7 @@ class _ProfileActionsState extends State<ProfileActions> {
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),
-
               const SizedBox(height: 22),
-
-              // Icon
               Container(
                 width: 62,
                 height: 62,
@@ -133,24 +180,19 @@ class _ProfileActionsState extends State<ProfileActions> {
                   size: 28,
                 ),
               ),
-
               const SizedBox(height: 14),
-
-              const Text(
-                'Invite Ahmed for a 1-on-1',
+              Text(
+                'Invite ${widget.userName} for a 1-on-1',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: dark,
                 ),
               ),
-
               const SizedBox(height: 8),
-
               const Text(
-                'Send a personal invitation to meet, chat '
-                    'and exchange skills.',
+                'Send a personal invitation to meet, chat and exchange skills.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,
@@ -158,39 +200,26 @@ class _ProfileActionsState extends State<ProfileActions> {
                   color: Color(0xFF777269),
                 ),
               ),
-
               const SizedBox(height: 22),
-
-              // Invite button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pop(context);
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          '1-on-1 invitation sent ✨',
-                        ),
+                        content: Text('1-on-1 invitation sent ✨'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },
-                  icon: const Icon(
-                    Icons.send_rounded,
-                    size: 18,
-                  ),
-                  label: const Text(
-                    'Send Invitation',
-                  ),
+                  icon: const Icon(Icons.send_rounded, size: 18),
+                  label: const Text('Send Invitation'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: gold,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 15,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -207,35 +236,7 @@ class _ProfileActionsState extends State<ProfileActions> {
       },
     );
   }
-
-  // =================================================================
-  // ENTER CAFÉ
-  // =================================================================
-
-  void _enterCafe(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Opening Ahmed\'s Café ☕',
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-
-    // Later we'll replace this with:
-    //
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(
-    //     builder: (_) => const CafeScreen(),
-    //   ),
-    // );
-  }
 }
-
-// ===================================================================
-// STANDARD ACTION BUTTON
-// ===================================================================
 
 class _ActionButton extends StatelessWidget {
   final String label;
@@ -266,29 +267,21 @@ class _ActionButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: Container(
           height: 50,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 7,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 7),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             border: isPrimary
                 ? null
                 : Border.all(
-              color: const Color(0xFFE5E0D8),
-              width: 1.2,
-            ),
+                    color: const Color(0xFFE5E0D8),
+                    width: 1.2,
+                  ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 17,
-                color: foregroundColor,
-              ),
-
+              Icon(icon, size: 17, color: foregroundColor),
               const SizedBox(width: 5),
-
               Flexible(
                 child: Text(
                   label,
@@ -308,10 +301,6 @@ class _ActionButton extends StatelessWidget {
     );
   }
 }
-
-// ===================================================================
-// FOLLOW BUTTON
-// ===================================================================
 
 class _FollowButton extends StatelessWidget {
   final bool isFollowing;
@@ -335,9 +324,7 @@ class _FollowButton extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           height: 50,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 11,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 11),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
@@ -351,15 +338,11 @@ class _FollowButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                isFollowing
-                    ? Icons.check_rounded
-                    : Icons.add_rounded,
+                isFollowing ? Icons.check_rounded : Icons.add_rounded,
                 size: 17,
                 color: const Color(0xFFC5A059),
               ),
-
               const SizedBox(width: 4),
-
               Text(
                 isFollowing ? 'Following' : 'Follow',
                 style: const TextStyle(

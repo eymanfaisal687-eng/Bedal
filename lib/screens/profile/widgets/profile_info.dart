@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/profile_provider.dart';
+import '../followers_following_screen.dart';
 
 class ProfileInfo extends StatelessWidget {
-  const ProfileInfo({super.key});
+  final String userName;
+
+  const ProfileInfo({super.key, this.userName = 'Ahmed'});
 
   static const Color gold = Color(0xFFC5A059);
   static const Color dark = Color(0xFF25231F);
@@ -10,6 +15,15 @@ class ProfileInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final profileProvider = context.watch<ProfileProvider>();
+    final profile = profileProvider.profile;
+
+    final showAge = profile?.showAge ?? true;
+    final showLocation = profile?.showLocation ?? true;
+    final age = profile?.age ?? '24';
+    final location = profile?.location ?? 'Al Rawdah, Jeddah';
+    final occupation = profile?.occupation ?? 'Student';
+
     return Container(
       color: background,
       padding: const EdgeInsets.fromLTRB(
@@ -18,77 +32,153 @@ class ProfileInfo extends StatelessWidget {
         22,
         18,
       ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 18,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.92),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: gold.withValues(alpha: 0.15),
+      child: Column(
+        children: [
+          // 1. Core Info (Age, Area, Community - respecting privacy toggles)
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 18,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: gold.withValues(alpha: 0.15),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.045),
+                  blurRadius: 18,
+                  offset: const Offset(0, 7),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                if (showAge) ...[
+                  Expanded(
+                    child: _InfoItem(
+                      icon: Icons.calendar_month_outlined,
+                      value: age,
+                      label: 'Years Old',
+                    ),
+                  ),
+                  const _Divider(),
+                ],
+                if (showLocation) ...[
+                  Expanded(
+                    child: _InfoItem(
+                      icon: Icons.location_on_outlined,
+                      value: location,
+                      label: 'Location',
+                    ),
+                  ),
+                  const _Divider(),
+                ],
+                Expanded(
+                  child: _InfoItem(
+                    icon: Icons.school_outlined,
+                    value: occupation,
+                    label: 'Occupation',
+                  ),
+                ),
+              ],
+            ),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.045),
-              blurRadius: 18,
-              offset: const Offset(0, 7),
-            ),
-          ],
-        ),
-        child: const Row(
-          children: [
+          const SizedBox(height: 12),
 
-            // -------------------------------------------------------
-            // AGE
-            // -------------------------------------------------------
-
-            Expanded(
-              child: _InfoItem(
-                icon: Icons.calendar_month_outlined,
-                value: '24',
-                label: 'Years Old',
+          // 2. Followers & Following Row
+          Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FollowersFollowingScreen(
+                          initialTabIndex: 0,
+                          userName: userName,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE5E0D5)),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.people_rounded, color: gold, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          '3 Followers',
+                          style: TextStyle(
+                            color: dark,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Plus Jakarta Sans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-
-            _Divider(),
-
-            // -------------------------------------------------------
-            // AREA
-            // -------------------------------------------------------
-
-            Expanded(
-              child: _InfoItem(
-                icon: Icons.location_on_outlined,
-                value: 'Al Rawdah',
-                label: 'Jeddah',
+              const SizedBox(width: 12),
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => FollowersFollowingScreen(
+                          initialTabIndex: 1,
+                          userName: userName,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE5E0D5)),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.person_add_rounded, color: gold, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          '2 Following',
+                          style: TextStyle(
+                            color: dark,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Plus Jakarta Sans',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-
-            _Divider(),
-
-            // -------------------------------------------------------
-            // COMMUNITY
-            // -------------------------------------------------------
-
-            Expanded(
-              child: _InfoItem(
-                icon: Icons.school_outlined,
-                value: 'Student',
-                label: 'in Jeddah',
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
-
-// ===================================================================
-// INFO ITEM
-// ===================================================================
 
 class _InfoItem extends StatelessWidget {
   final IconData icon;
@@ -105,9 +195,6 @@ class _InfoItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-
-        // Icon
-
         Container(
           width: 38,
           height: 38,
@@ -121,11 +208,7 @@ class _InfoItem extends StatelessWidget {
             color: const Color(0xFFC5A059),
           ),
         ),
-
         const SizedBox(height: 8),
-
-        // Main value
-
         Text(
           value,
           maxLines: 1,
@@ -137,11 +220,7 @@ class _InfoItem extends StatelessWidget {
             color: Color(0xFF25231F),
           ),
         ),
-
         const SizedBox(height: 2),
-
-        // Label
-
         Text(
           label,
           maxLines: 1,
@@ -157,10 +236,6 @@ class _InfoItem extends StatelessWidget {
     );
   }
 }
-
-// ===================================================================
-// DIVIDER
-// ===================================================================
 
 class _Divider extends StatelessWidget {
   const _Divider();

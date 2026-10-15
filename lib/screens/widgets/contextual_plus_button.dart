@@ -1,30 +1,25 @@
 // =========================================================================
 // ➕ FILE: contextual_plus_button.dart
-// ROLE: Contextual Action Trigger Widget
-// =========================================================================
-// BEDAL BEHAVIOR:
-//
-// HOME  → Open camera → Record skill video
-// EXPLORE → Open explore creation/actions
-// HUBS → Open activity creation (Level 2+)
-//
-// IMPORTANT:
-// This widget ONLY routes the action.
-// Camera recording and form logic belong to their own screens.
+// ROLE: Contextual Action Trigger Widget for Main Navigation Header Icons
 // =========================================================================
 
 import 'package:flutter/material.dart';
+import 'package:bedal/models/swap_session_model.dart';
+import 'package:bedal/screens/chat/swap/escrow_start_view.dart';
+import 'package:bedal/screens/chat/swap/create_workshop_form.dart';
+import 'package:bedal/screens/hubs/widgets/notice_board_sheet.dart';
+import 'header_action_sheets.dart';
 
 class ContextualPlusButton extends StatelessWidget {
   final int currentIndex;
 
-  // HOME: Open camera → Record skill video
+  // HOME: Open camera / Creator studio menu
   final VoidCallback onOpenCamera;
 
-  // EXPLORE: Open explore actions → Start group skill meetup
+  // EXPLORE: Open explore actions / Create workshop
   final VoidCallback onOpenExploreMenu;
 
-  // HUBS: Open activity creation → Community notice board
+  // HUBS: Open notice board sheet
   final VoidCallback onOpenCasualForm;
 
   const ContextualPlusButton({
@@ -35,16 +30,11 @@ class ContextualPlusButton extends StatelessWidget {
     required this.onOpenCasualForm,
   });
 
-  // =========================================================================
-  // BEDAL COLORS
-  // =========================================================================
-
-  static const Color gold = Color(0xFFFFFFFF);
+  static const Color gold = Color(0xFFC5A059);
   static const Color darkCard = Color(0xFF1A1B1E);
 
   @override
   Widget build(BuildContext context) {
-    // Determine context-specific icon
     IconData contextualIcon;
     switch (currentIndex) {
       case 0:
@@ -56,8 +46,10 @@ class ContextualPlusButton extends StatelessWidget {
       case 2:
         contextualIcon = Icons.campaign_rounded;
         break;
+      case 3:
       default:
-        contextualIcon = Icons.add_rounded;
+        contextualIcon = Icons.swap_horiz_rounded;
+        break;
     }
 
     return Material(
@@ -74,7 +66,7 @@ class ContextualPlusButton extends StatelessWidget {
             color: darkCard,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.9), // Thick white
+              color: Colors.white.withValues(alpha: 0.9),
               width: 2.0,
             ),
             boxShadow: [
@@ -89,7 +81,7 @@ class ContextualPlusButton extends StatelessWidget {
             child: Icon(
               contextualIcon,
               size: 26,
-              color: Color(0xFFB88A32) // Sharp pure white for better visibility
+              color: gold,
             ),
           ),
         ),
@@ -98,133 +90,50 @@ class ContextualPlusButton extends StatelessWidget {
   }
 
   // =========================================================================
-  // CONTEXTUAL ROUTER
+  // CONTEXTUAL ROUTER FOR ALL 4 TAB HEADER ICONS
   // =========================================================================
 
   void _handlePlusTap(BuildContext context) {
     switch (currentIndex) {
-    // =====================================================================
-    // HOME
-    // =====================================================================
-    //
-    // The Home + button has ONE purpose:
-    //
-    //     Open Camera
-    //
-    // No gallery.
-    // No explore menu.
-    // No swap menu.
-    // No additional popup.
-    //
-    // The camera screen will handle the 15-second recording.
-    // =====================================================================
-
       case 0:
-        onOpenCamera();
+        // 1. HOME TAB HEADER: CAMERA ICON OVERHAUL (Skill Reel & Café Wall)
+        HeaderActionSheets.showHomeCameraMenu(context);
         break;
-
-    // =====================================================================
-    // EXPLORE
-    // =====================================================================
 
       case 1:
-        onOpenExploreMenu();
+        // 2. EXPLORE TAB HEADER 1: HOST A GROUP WORKSHOP
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const CreateWorkshopForm()),
+        );
         break;
-
-    // =====================================================================
-    // HUBS
-    // =====================================================================
 
       case 2:
-        _handleHubsAction(context);
+        // 3. EXPLORE TAB HEADER 2 / HUBS: NOTICE BOARD ICON
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (_) => const NoticeBoardSheet(activeCity: 'Islamabad'),
+        );
         break;
 
-    // =====================================================================
-    // OTHER
-    // =====================================================================
-
+      case 3:
       default:
-        debugPrint(
-          'Bedal: Plus button disabled on dashboard index $currentIndex.',
+        // 4. CHAT TAB HEADER: SKILL SWAP SPEED ICON (EscrowStartView)
+        final sampleSession = SwapSession(
+          sessionId: 'session_${DateTime.now().millisecondsSinceEpoch}',
+          peerName: 'Sara Ali',
+          peerAvatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+          targetSkill: 'UI/UX ↔ Figma',
+          durationHours: 1.0,
+          activeStatus: SwapStatus.initial,
         );
-    }
-  }
-
-  // =========================================================================
-  // HUB LEVEL CHECK
-  // =========================================================================
-
-  void _handleHubsAction(BuildContext context) {
-    // Temporary value.
-    //
-    // Later this should come from the user's actual profile/account state.
-    const int userLevel = 2;
-
-    if (userLevel >= 2) {
-      onOpenCasualForm();
-      return;
-    }
-
-    _showLevelLockAlert(context);
-  }
-
-  // =========================================================================
-  // LEVEL LOCK
-  // =========================================================================
-
-  void _showLevelLockAlert(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: darkCard,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          title: const Row(
-            children: [
-              Icon(
-                Icons.lock_outline_rounded,
-                color: gold,
-                size: 22,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Level 2 Required',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: const Text(
-            'Reach Senior Pass (Level 2) to create and post activities in Hubs.',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              height: 1.45,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text(
-                'Got it',
-                style: TextStyle(
-                  color: gold,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => EscrowStartView(session: sampleSession)),
         );
-      },
-    );
+        break;
+    }
   }
 }

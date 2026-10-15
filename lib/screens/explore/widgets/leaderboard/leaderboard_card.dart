@@ -48,7 +48,7 @@ class LeaderCard extends StatelessWidget {
     final bool isMentor = mode == LeaderboardMode.mentor;
 
     // Dynamic Metric Data
-    final String metricValue = isMentor ? '${taughtHours} hrs' : '${_formatXP(xp)} XP';
+    final String metricValue = isMentor ? '$taughtHours hrs' : '${_formatXP(xp)} XP';
     final String metricLabel = isMentor ? 'Taught' : 'Knowledge Gained';
     final IconData metricIcon =
         isMentor ? Icons.schedule_rounded : Icons.bolt_rounded;
@@ -201,7 +201,7 @@ class LeaderCard extends StatelessWidget {
             ? Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _fallbackAvatar(),
+                errorBuilder: (_, _, _) => _fallbackAvatar(),
               )
             : _fallbackAvatar(),
       ),
@@ -290,9 +290,9 @@ class LeaderCard extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.5),
-            fontSize: 9,
-            fontWeight: FontWeight.w600,
+            color: Colors.white.withValues(alpha: 0.4),
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
             fontFamily: 'Plus Jakarta Sans',
           ),
         ),
@@ -301,9 +301,9 @@ class LeaderCard extends StatelessWidget {
   }
 
   String _formatXP(int xp) {
-    return xp.toString().replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-        );
+    if (xp >= 1000) {
+      return '${(xp / 1000).toStringAsFixed(1)}k';
+    }
+    return xp.toString();
   }
 }

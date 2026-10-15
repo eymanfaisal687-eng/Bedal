@@ -9,6 +9,7 @@ import '../home/home_screen.dart';
 import '../explore/explore_screen.dart';
 import '../profile/profile_screen.dart';
 import '../hubs/hubs_screen.dart';
+import '../chat/chat_screen.dart';
 import '../notifications/notification_screen.dart';
 
 import 'bottom_nav_bar.dart';
@@ -19,14 +20,16 @@ import 'app_header.dart';
 // =========================================================================
 
 final GlobalKey<MainLayoutState> mainLayoutKey =
-GlobalKey<MainLayoutState>();
+    GlobalKey<MainLayoutState>();
 
 // =========================================================================
 // MAIN LAYOUT
 // =========================================================================
 
 class MainLayout extends StatefulWidget {
-  MainLayout({Key? key}) : super(key: mainLayoutKey);
+  final bool isReadOnly;
+
+  MainLayout({Key? key, this.isReadOnly = false}) : super(key: mainLayoutKey);
 
   @override
   State<MainLayout> createState() => MainLayoutState();
@@ -44,19 +47,7 @@ class MainLayoutState extends State<MainLayout> {
       HomeScreen(isActive: _currentIndex == 0), // 0
       const ExploreScreen(), // 1
       const HubsScreen(), // 2
-
-      const Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Text(
-            'Chat Screen Space',
-            style: TextStyle(
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ), // 3
-
+      const ChatScreen(), // 3
       const ProfileScreen(), // 4
     ];
   }
@@ -96,7 +87,8 @@ class MainLayoutState extends State<MainLayout> {
     final bool showHeader =
         _currentIndex == 0 ||
             _currentIndex == 1 ||
-            _currentIndex == 2;
+            _currentIndex == 2 ||
+            _currentIndex == 3;
 
     return Scaffold(
       backgroundColor: Colors.black,

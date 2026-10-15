@@ -3,7 +3,7 @@ import 'skill_detail_screen.dart';
 
 // ========================================================================
 // 📄 FILE: skill_card.dart
-// PURPOSE: A single premium skill card for the Trending Skills section.
+// PURPOSE: A single premium skill card for the Trending Skills section (Hub Screen style).
 // ========================================================================
 
 class SkillCard extends StatelessWidget {
@@ -21,7 +21,10 @@ class SkillCard extends StatelessWidget {
   final int? rank;
 
   static const Color gold = Color(0xFFC5A059);
-  static const Color darkCard = Color(0xFF1A1B1E);
+  static const Color charcoal = Color(0xFF16171A);
+  static const Color mutedText = Color(0xFF7A7368);
+  static const Color cardBg = Color(0xFFFFFFFF);
+  static const Color borderColor = Color(0xFFE3E0D6);
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +42,17 @@ class SkillCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
-            color: darkCard,
+            color: cardBg,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: borderColor,
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -65,10 +68,10 @@ class SkillCard extends StatelessWidget {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: gold.withValues(alpha: 0.1),
+                        color: gold.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: gold.withValues(alpha: 0.2),
+                          color: gold.withValues(alpha: 0.25),
                           width: 1,
                         ),
                       ),
@@ -87,7 +90,7 @@ class SkillCard extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: charcoal,
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         fontFamily: 'Plus Jakarta Sans',
@@ -113,8 +116,8 @@ class SkillCard extends StatelessWidget {
                             activeCount,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.45),
+                            style: const TextStyle(
+                              color: mutedText,
                               fontSize: 9.5,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Plus Jakarta Sans',
@@ -131,9 +134,9 @@ class SkillCard extends StatelessWidget {
               Positioned(
                 top: 12,
                 right: 8,
-                child: Icon(
+                child: const Icon(
                   Icons.chevron_right_rounded,
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: mutedText,
                   size: 18,
                 ),
               ),
@@ -146,9 +149,10 @@ class SkillCard extends StatelessWidget {
                   child: Text(
                     '#$rank',
                     style: TextStyle(
-                      color: gold.withValues(alpha: 0.2),
+                      color: gold.withValues(alpha: 0.5),
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
+                      fontFamily: 'Plus Jakarta Sans',
                     ),
                   ),
                 ),

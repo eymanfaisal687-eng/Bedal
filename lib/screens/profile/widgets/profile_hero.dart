@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 
 class ProfileHero extends StatelessWidget {
-  const ProfileHero({super.key});
+  final String characterAsset;
+  final String backgroundAsset;
+  final String profileName;
+  final VoidCallback? onChangeCharacter;
+  final VoidCallback? onChangeBackground;
+
+  const ProfileHero({
+    super.key,
+    this.characterAsset = 'assets/images/profile/character_profile/male_characters/saudi_man.png',
+    this.backgroundAsset = 'assets/images/profile/background_profile/background_profile.png',
+    this.profileName = 'Ahmed',
+    this.onChangeCharacter,
+    this.onChangeBackground,
+  });
 
   // ===============================================================
   // COLORS
@@ -11,18 +24,10 @@ class ProfileHero extends StatelessWidget {
   static const Color cream = Color(0xFFF8F5EF);
   static const Color dark = Color(0xFF25231F);
 
-  // ===============================================================
-  // ASSETS
-  // ===============================================================
-
-  static const String characterAsset =
-      'assets/images/profile/saudi_man.png';
-
-  static const String backgroundAsset =
-      'assets/images/profile/background_profile.png';
-
   @override
   Widget build(BuildContext context) {
+    final bool isFemale = characterAsset.toLowerCase().contains('women') || characterAsset.toLowerCase().contains('woman');
+
     return SizedBox(
       height: 555,
       child: ClipRRect(
@@ -33,7 +38,7 @@ class ProfileHero extends StatelessWidget {
           children: [
 
             // =========================================================
-            // JEDDAH BACKGROUND
+            // JEDDAH BACKGROUND (DYNAMIC)
             // =========================================================
 
             Positioned.fill(
@@ -96,20 +101,21 @@ class ProfileHero extends StatelessWidget {
             ),
 
             // =========================================================
-            // 3D CHARACTER
+            // 3D CHARACTER (DYNAMICALLY SIZED FOR FEMALE / MALE)
             // =========================================================
 
             Positioned(
-              top: 55,
+              top: isFemale ? 80 : 55,
               bottom: 0,
-              left: 62,
-              right: 62,
+              left: isFemale ? 85 : 62,
+              right: isFemale ? 85 : 62,
               child: IgnorePointer(
                 child: Image.asset(
                   characterAsset,
                   fit: BoxFit.contain,
                   alignment: Alignment.bottomCenter,
                   errorBuilder: (context, error, stackTrace) {
+                    debugPrint('❌ Failed to load asset $characterAsset: $error');
                     return const Center(
                       child: Icon(
                         Icons.person,
@@ -129,7 +135,7 @@ class ProfileHero extends StatelessWidget {
             Positioned(
               left: 24,
               bottom: 32,
-              child: const _ProfileName(),
+              child: _ProfileName(name: profileName),
             ),
 
             // =========================================================
@@ -226,7 +232,10 @@ class ProfileHero extends StatelessWidget {
                 icon: Icons.face_retouching_natural_rounded,
                 title: 'Change Character',
                 subtitle: 'Choose your 3D character',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  onChangeCharacter?.call();
+                },
               ),
 
               // =====================================================
@@ -237,7 +246,10 @@ class ProfileHero extends StatelessWidget {
                 icon: Icons.wallpaper_rounded,
                 title: 'Change Background',
                 subtitle: 'Choose your Jeddah environment',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  onChangeBackground?.call();
+                },
               ),
 
               // =====================================================
@@ -248,7 +260,12 @@ class ProfileHero extends StatelessWidget {
                 icon: Icons.edit_rounded,
                 title: 'Change Name',
                 subtitle: 'Update your display name',
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Display name editor active')),
+                  );
+                },
               ),
 
               const SizedBox(height: 8),
@@ -265,7 +282,9 @@ class ProfileHero extends StatelessWidget {
 // ===================================================================
 
 class _ProfileName extends StatelessWidget {
-  const _ProfileName();
+  final String name;
+
+  const _ProfileName({required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -296,9 +315,9 @@ class _ProfileName extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
 
-              const Text(
-                'Ahmed',
-                style: TextStyle(
+              Text(
+                name,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
                   color: ProfileHero.dark,

@@ -61,6 +61,8 @@ class SkillMemberCard extends StatelessWidget {
               children: [
                 Text(
                   name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: primaryDark,
                     fontSize: 15,
@@ -87,13 +89,17 @@ class SkillMemberCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.location_on_rounded, size: 12, color: gold),
                     const SizedBox(width: 4),
-                    Text(
-                      location,
-                      style: TextStyle(
-                        color: primaryDark.withValues(alpha: 0.4),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Plus Jakarta Sans',
+                    Flexible(
+                      child: Text(
+                        location,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: primaryDark.withValues(alpha: 0.4),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Plus Jakarta Sans',
+                        ),
                       ),
                     ),
                     if (rating != null) ...[

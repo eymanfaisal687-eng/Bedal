@@ -4,12 +4,10 @@
 // =========================================================================
 //
 // BEHAVIOR:
-// • Left + button opens Bedal's IN-APP video recorder.
-// • No gallery access.
-// • No explore menu.
-// • Right heart opens the Notifications screen.
-// • No notification number/badge.
-// • Arabic Bedal logo remains centered.
+// • Left + button opens contextual action based on tab.
+// • Arabic Bedal logo remains perfectly centered with elegant gold tint.
+// • Right side:
+//   - Heart Notification button (opens Notifications screen).
 // =========================================================================
 
 import 'package:flutter/material.dart';
@@ -43,7 +41,7 @@ class AppHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
             children: [
               // =====================================================
@@ -120,9 +118,9 @@ class _HeaderButton extends StatelessWidget {
           height: 46,
           child: Icon(
             icon,
-            size: 28, // Boosted size for visual weight
-            color: Colors.white, // Pure white
-            weight: 700, // Thicker stroke weight for symmetry
+            size: 28,
+            color: Colors.white,
+            weight: 700,
           ),
         ),
       ),

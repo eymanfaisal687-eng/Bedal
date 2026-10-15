@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../auth/step_1/signup_account_screen.dart';
+import '../auth/step_2/security_check_screen.dart';
 import '../auth/login/login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (currentPage == images.length - 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const SignupAccountScreen()),
+        MaterialPageRoute(builder: (context) => const SecurityCheckScreen()),
       );
     } else {
       _controller.nextPage(
@@ -145,7 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       const SizedBox(height: 14),
 
                       // ==================================================
-                      // NEXT / GET STARTED BUTTON
+                      // NEXT / Join Bedal BUTTON
                       // ==================================================
                       SizedBox(
                         width: double.infinity,
@@ -196,7 +196,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               children: [
                                 Text(
                                   currentPage == images.length - 1
-                                      ? "Get Started"
+                                      ? "Join Bedal"
                                       : "Next",
 
                                   style: const TextStyle(

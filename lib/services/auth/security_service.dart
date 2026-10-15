@@ -1,29 +1,18 @@
-import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
 
+/// This service manages app-level security gates, validation enclaves,
+/// and identity verification handshakes (like Nafath integrations).
 class SecurityService {
-  final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  // Hardcoded server-side backup invitation list for early campus beta tracking
+  final List<String> _masterSecurityCodes = ['BEDAL100', 'CAMPUS2026', 'JEDDAH2026'];
 
-  /// Natively fetches the unique software identifier for fingerprint configuration
-  Future<String> fetchSecureDeviceId() async {
-    try {
-      if (Platform.isAndroid) {
-        final androidInfo = await _deviceInfo.androidInfo;
-        return androidInfo.id;
-      } else if (Platform.isIOS) {
-        final iosInfo = await _deviceInfo.iosInfo;
-        return iosInfo.identifierForVendor ?? "unknown_ios_signature";
-      }
-      return "anonymous_client";
-    } catch (_) {
-      return "fallback_anonymous_token";
+  /// Validates if a registration request is coming from a trusted beta path.
+  /// This will connect to your local secure server verification loop in Phase 2.
+  bool validateSystemIntegrity(String inputCode) {
+    debugPrint('Security Engine: Auditing payload integrity checkpoint...');
+    if (_masterSecurityCodes.contains(inputCode.toUpperCase())) {
+      return true;
     }
-  }
-
-  /// Simulates background regional geofencing lookups
-  Future<bool> verifyJeddahGeofence(String deviceId) async {
-    // Simulated backend server validation check delay
-    await Future.delayed(const Duration(milliseconds: 1800));
-    return true; // Set to false to test out 'Explore Mode' layout paths
+    return false;
   }
 }

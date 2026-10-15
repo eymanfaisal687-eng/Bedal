@@ -99,12 +99,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// 2. Embedded login character image located between Header and Welcome text
+  /// 2. Embedded login logo image located between Header and Welcome text
   Widget _buildCharacterImageSection() {
     return Container(
-      width: 344,
-      height: 344,
-      // Adjusted layout constraint to handle text fields elegantly below it
+      width: 160,
+      height: 160,
+      margin: const EdgeInsets.symmetric(vertical: 16),
       decoration: const BoxDecoration(
         gradient: RadialGradient(
           center: Alignment(0.50, 0.50),
@@ -113,18 +113,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Image.asset(
-        'assets/images/character_images/login_screen_character.png',
+        'assets/images/logo/bedal_logo2.png',
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          // Graceful fallback placeholder layout if your project's asset tree path changes
-          return Container(
-            clipBehavior: Clip.antiAlias,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage("https://placehold.co"),
-                fit: BoxFit.fill,
-              ),
-            ),
+          return const Icon(
+            Icons.bolt_rounded,
+            color: Color(0xFFC89B3C),
+            size: 64,
           );
         },
       ),
