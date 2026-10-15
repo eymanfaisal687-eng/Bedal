@@ -10,44 +10,28 @@ Instead of simply matching people based on profiles, Bedal encourages users to t
 🚀 About Bedal
 
 Bedal is being built to make learning and social connection more interactive.
-
-
 Users can:
-
 🎯 Discover people based on skills and interests
-
 🎥 Share short skill videos
-
 🤝 Invite people to skill exchanges
-
 📅 Manage meetup availability
-
 💬 Chat with other users
-
 👤 Build a personalized profile
-
 ☕ Create their own virtual My Café
-
 🏆 Complete quests and progress through levels
-
 🪙 Earn and use Bedal Time Tokens
-
 🌍 Connect with locals, expats, students, tourists, and hobbyists
-
 📍 Discover communities and skill hubs
 
 The goal is to turn skill exchange into a social experience rather than a traditional learning platform.
 
 
 🎮 Core Concept
-
 Bedal is built around a simple idea:
 Everyone knows something. Everyone wants to learn something.
 For example:
-
 Someone knows Python but wants to learn photography.
 Another user knows photography but wants to learn Python.
-
 Instead of paying for a traditional class, Bedal allows them to connect and exchange their time and skills.
 
 ✨ Main Features
