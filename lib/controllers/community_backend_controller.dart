@@ -1,6 +1,6 @@
 // =========================================================================
-// 📄 FILE: community_backend_controller.dart
-// ROLE: Firestore Backend Controller for Community Actions (Reels, Café Wall, Workshops, Notices)
+// FILE: community_backend_controller.dart
+// ROLE: Firestore Backend Controller for Community Features
 // =========================================================================
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,11 +8,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bedal/models/community_models.dart';
 
+/// Backend controller managing community operations (Skill Reels, Cafe Wall, Workshops, Notices).
 class CommunityBackendController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 1. Save Skill Reel to 'skill_reels' collection
+  /// Saves a new Skill Reel document to the 'skill_reels' Firestore collection.
   Future<bool> postSkillReel({
     required String caption,
     required String meetupTimings,
@@ -39,15 +40,15 @@ class CommunityBackendController {
       );
 
       await docRef.set(reel.toMap());
-      debugPrint('✅ Skill reel posted successfully: ${docRef.id}');
+      debugPrint('Skill reel posted successfully: ${docRef.id}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error posting skill reel: $e');
+      debugPrint('Error posting skill reel: $e');
       return false;
     }
   }
 
-  // 2. Save Café Post to 'cafe_wall_posts' collection
+  /// Saves a new post document to the 'cafe_wall_posts' Firestore collection.
   Future<bool> postCafeWallMessage({
     required String content,
     String? mediaUrl,
@@ -68,15 +69,15 @@ class CommunityBackendController {
       );
 
       await docRef.set(post.toMap());
-      debugPrint('✅ Café wall post saved successfully: ${docRef.id}');
+      debugPrint('Cafe wall post saved successfully: ${docRef.id}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error posting to café wall: $e');
+      debugPrint('Error posting to cafe wall: $e');
       return false;
     }
   }
 
-  // 3. Save Workshop to 'group_workshops' collection
+  /// Creates a new group workshop record capped at a maximum of 5 students per session.
   Future<bool> createWorkshop({
     required String topic,
     required String date,
@@ -98,20 +99,20 @@ class CommunityBackendController {
         date: date,
         time: time,
         venueLocation: venueLocation,
-        maxStudents: maxStudents > 5 ? 5 : maxStudents, // capped at 5
+        maxStudents: maxStudents > 5 ? 5 : maxStudents, // Enforce maximum 5 students limit
         createdAt: DateTime.now(),
       );
 
       await docRef.set(workshop.toMap());
-      debugPrint('✅ Group workshop created successfully: ${docRef.id}');
+      debugPrint('Group workshop created successfully: ${docRef.id}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error creating workshop: $e');
+      debugPrint('Error creating workshop: $e');
       return false;
     }
   }
 
-  // 4. Stream Notice Board Cards from 'hubs_notice_board' based on city
+  /// Streams notice board entries from 'hubs_notice_board' filtered by user city.
   Stream<List<NoticeCardModel>> streamNoticeBoard({required String city}) {
     return _firestore
         .collection('hubs_notice_board')

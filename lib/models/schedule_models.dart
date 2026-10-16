@@ -1,16 +1,17 @@
 // =========================================================================
-// 📄 FILE: schedule_models.dart
-// PURPOSE: Data models for availability time slots and meetup requests
+// FILE: schedule_models.dart
+// ROLE: Data Models for Availability Slots and Meetup Requests
 // =========================================================================
 
+/// Model representing a user's calendar availability time slot.
 class AvailabilitySlotModel {
-  final String id;
-  final String userId;
-  final DateTime date;
-  final String startTime; // e.g. "10:00 AM"
-  final String endTime;   // e.g. "12:00 PM"
-  final bool isAvailable; // true = Available, false = Busy/Unavailable
-  final bool isRecurring;
+  final String id; // Unique slot ID
+  final String userId; // User ID owner
+  final DateTime date; // Slot date
+  final String startTime; // Start time string (e.g., "10:00 AM")
+  final String endTime; // End time string (e.g., "12:00 PM")
+  final bool isAvailable; // Availability status flag
+  final bool isRecurring; // Recurring schedule flag
 
   AvailabilitySlotModel({
     required this.id,
@@ -22,6 +23,7 @@ class AvailabilitySlotModel {
     this.isRecurring = false,
   });
 
+  /// Converts the slot object into a Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -34,6 +36,7 @@ class AvailabilitySlotModel {
     };
   }
 
+  /// Instantiates an [AvailabilitySlotModel] from a Map.
   factory AvailabilitySlotModel.fromMap(Map<String, dynamic> map) {
     return AvailabilitySlotModel(
       id: map['id'] ?? '',
@@ -47,21 +50,23 @@ class AvailabilitySlotModel {
   }
 }
 
+/// Status enumeration for peer meetup requests.
 enum MeetupStatus { pending, accepted, declined, cancelled }
 
+/// Model representing a peer meetup booking request.
 class MeetupRequestModel {
-  final String id;
-  final String senderUid;
-  final String senderName;
-  final String senderAvatar;
-  final String receiverUid;
-  final String slotId;
-  final DateTime date;
-  final String timeSlot;
-  final String purpose;
-  final String? message;
-  final MeetupStatus status;
-  final DateTime timestamp;
+  final String id; // Unique request ID
+  final String senderUid; // Sender user ID
+  final String senderName; // Sender display name
+  final String senderAvatar; // Sender avatar image URL or asset
+  final String receiverUid; // Receiver user ID
+  final String slotId; // Requested availability slot ID
+  final DateTime date; // Request date
+  final String timeSlot; // Formatted time window
+  final String purpose; // Meetup purpose description
+  final String? message; // Optional personal note message
+  final MeetupStatus status; // Request lifecycle status
+  final DateTime timestamp; // Creation timestamp
 
   MeetupRequestModel({
     required this.id,
@@ -78,6 +83,7 @@ class MeetupRequestModel {
     required this.timestamp,
   });
 
+  /// Converts the request object into a Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -95,6 +101,7 @@ class MeetupRequestModel {
     };
   }
 
+  /// Instantiates a [MeetupRequestModel] from a Map.
   factory MeetupRequestModel.fromMap(Map<String, dynamic> map) {
     return MeetupRequestModel(
       id: map['id'] ?? '',

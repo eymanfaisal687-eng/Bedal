@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/profile_provider.dart';
+import '../../../providers/profile_provider.dart';
 import '../followers_following_screen.dart';
 
 class ProfileInfo extends StatelessWidget {

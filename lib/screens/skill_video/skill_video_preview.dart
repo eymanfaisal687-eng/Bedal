@@ -646,7 +646,7 @@ class _SkillPreviewState extends State<SkillPreview> {
 
         itemCount: options.length,
 
-        separatorBuilder: (_, __) {
+        separatorBuilder: (_, index) {
           return const SizedBox(width: 8);
         },
 

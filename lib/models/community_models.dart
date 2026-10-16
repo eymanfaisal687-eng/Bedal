@@ -1,18 +1,19 @@
 // =========================================================================
-// 📄 FILE: community_models.dart
-// ROLE: Data Models for Skill Reels, Café Wall Posts, Workshops & Notices
+// FILE: community_models.dart
+// ROLE: Data Models for Skill Reels, Cafe Wall Posts, Workshops & Notices
 // =========================================================================
 
+/// Data model for short skill video reels.
 class SkillReelModel {
-  final String id;
-  final String uid;
-  final String authorName;
-  final String caption;
-  final String meetupTimings;
-  final double bedalHoursRequired;
-  final String meetupRestriction; // 'Girls Only', 'Boys Only', 'Open to All'
-  final String videoUrl;
-  final DateTime createdAt;
+  final String id; // Unique reel document ID
+  final String uid; // Author user ID
+  final String authorName; // Author display name
+  final String caption; // Reel video caption text
+  final String meetupTimings; // Preferred meetup availability
+  final double bedalHoursRequired; // Duration cost in Bedal Hours
+  final String meetupRestriction; // Audience filter restriction ('Girls Only', 'Boys Only', 'Open to All')
+  final String videoUrl; // Hosted video URL
+  final DateTime createdAt; // Creation timestamp
 
   const SkillReelModel({
     required this.id,
@@ -26,6 +27,7 @@ class SkillReelModel {
     required this.createdAt,
   });
 
+  /// Converts the reel object into a Firestore Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -41,13 +43,14 @@ class SkillReelModel {
   }
 }
 
+/// Data model for community cafe wall messages.
 class CafePostModel {
-  final String id;
-  final String uid;
-  final String authorName;
-  final String content;
-  final String? mediaUrl;
-  final DateTime createdAt;
+  final String id; // Post document ID
+  final String uid; // Author user ID
+  final String authorName; // Author display name
+  final String content; // Message content text
+  final String? mediaUrl; // Optional attached media URL
+  final DateTime createdAt; // Creation timestamp
 
   const CafePostModel({
     required this.id,
@@ -58,6 +61,7 @@ class CafePostModel {
     required this.createdAt,
   });
 
+  /// Converts the cafe post object into a Firestore Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -70,16 +74,17 @@ class CafePostModel {
   }
 }
 
+/// Data model for group learning workshops.
 class WorkshopModel {
-  final String id;
-  final String hostUid;
-  final String hostName;
-  final String topic;
-  final String date;
-  final String time;
-  final String venueLocation;
-  final int maxStudents; // capped at 5
-  final DateTime createdAt;
+  final String id; // Workshop document ID
+  final String hostUid; // Workshop host user ID
+  final String hostName; // Host display name
+  final String topic; // Learning topic title
+  final String date; // Event date string
+  final String time; // Event time string
+  final String venueLocation; // Physical venue address
+  final int maxStudents; // Student capacity limit (max 5)
+  final DateTime createdAt; // Creation timestamp
 
   const WorkshopModel({
     required this.id,
@@ -93,6 +98,7 @@ class WorkshopModel {
     required this.createdAt,
   });
 
+  /// Converts the workshop object into a Firestore Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -108,13 +114,14 @@ class WorkshopModel {
   }
 }
 
+/// Data model for community notice board request cards.
 class NoticeCardModel {
-  final String id;
-  final String peerName;
-  final String requestedSkill;
-  final String city;
-  final String status;
-  final DateTime createdAt;
+  final String id; // Notice card ID
+  final String peerName; // Peer display name
+  final String requestedSkill; // Skill requested
+  final String city; // Hub city location
+  final String status; // Notice status ('Open', 'Matched', 'Closed')
+  final DateTime createdAt; // Creation timestamp
 
   const NoticeCardModel({
     required this.id,
@@ -125,6 +132,7 @@ class NoticeCardModel {
     required this.createdAt,
   });
 
+  /// Converts notice card object into a Firestore Map.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -136,6 +144,7 @@ class NoticeCardModel {
     };
   }
 
+  /// Factory constructor to instantiate a notice card from Firestore snapshot data.
   factory NoticeCardModel.fromMap(Map<String, dynamic> map, String docId) {
     return NoticeCardModel(
       id: docId,

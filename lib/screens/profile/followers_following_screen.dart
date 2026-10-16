@@ -115,7 +115,7 @@ class _FollowersFollowingScreenState extends State<FollowersFollowingScreen> wit
               CircleAvatar(
                 radius: 24,
                 backgroundImage: AssetImage(user.avatar),
-                onBackgroundImageError: (_, __) {},
+                onBackgroundImageError: (e, stack) {},
                 backgroundColor: gold.withValues(alpha: 0.2),
               ),
               const SizedBox(width: 14),

@@ -1,32 +1,33 @@
 // =========================================================================
-// 📄 FILE: user_profile_model.dart
-// ROLE: User Profile Blueprint Model for Firestore Database with Visibility & Level
+// FILE: user_profile_model.dart
+// ROLE: User Profile Blueprint Data Model for Firestore
 // =========================================================================
 
+/// Data model representing a user profile with personal info, stats, and privacy toggles.
 class UserProfileModel {
-  final String uid;
-  final String fullName; // username / displayName
-  final String email;
-  final String registeredCity;
-  final String gender;
-  final bool showGender;
-  final String nationality;
-  final bool showNationality;
-  final String age;
-  final bool showAge;
-  final String location;
-  final bool showLocation;
-  final String occupation;
-  final String profileImageUrl;
-  final String selectedCharacter;
-  final String selectedCharacterImage;
-  final int currentLevel; // level
-  final int experiencePoints; // experience
-  final int followersCount;
-  final int followingCount;
-  final double bedalTokensBalance;
-  final String createdAt;
-  final String updatedAt;
+  final String uid; // Unique Firebase Authentication User ID
+  final String fullName; // Display name
+  final String email; // Account email address
+  final String registeredCity; // Primary city location
+  final String gender; // Gender identity
+  final bool showGender; // Privacy toggle for public gender display
+  final String nationality; // Country nationality
+  final bool showNationality; // Privacy toggle for public nationality display
+  final String age; // User age string
+  final bool showAge; // Privacy toggle for public age display
+  final String location; // Area or neighborhood location
+  final bool showLocation; // Privacy toggle for public location display
+  final String occupation; // Student or professional role
+  final String profileImageUrl; // Custom profile image URL from Firebase Storage
+  final String selectedCharacter; // Avatar character identifier key
+  final String selectedCharacterImage; // Avatar asset image path
+  final int currentLevel; // Gamified user level
+  final int experiencePoints; // Experience points (XP)
+  final int followersCount; // Total followers count
+  final int followingCount; // Total following count
+  final double bedalTokensBalance; // Bedal Tokens wallet balance
+  final String createdAt; // ISO timestamp string of profile creation
+  final String updatedAt; // ISO timestamp string of last profile update
 
   UserProfileModel({
     required this.uid,
@@ -54,6 +55,7 @@ class UserProfileModel {
     this.updatedAt = '',
   });
 
+  /// Converts the profile instance into a JSON Map for Firestore persistence.
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
@@ -82,6 +84,7 @@ class UserProfileModel {
     };
   }
 
+  /// Instantiates a [UserProfileModel] from a Firestore document snapshot map.
   factory UserProfileModel.fromMap(Map<String, dynamic> map) {
     return UserProfileModel(
       uid: map['uid'] ?? '',
@@ -110,6 +113,7 @@ class UserProfileModel {
     );
   }
 
+  /// Creates a copy of [UserProfileModel] with updated field values.
   UserProfileModel copyWith({
     String? fullName,
     String? age,
@@ -151,7 +155,7 @@ class UserProfileModel {
   }
 }
 
-/// Avatar resolver utility function returning custom image, character asset, or fallback default.
+/// Resolves avatar image asset path or network URL based on user profile preferences.
 String resolveAvatarAssetOrUrl(UserProfileModel? profile) {
   if (profile != null && profile.profileImageUrl.trim().isNotEmpty) {
     return profile.profileImageUrl.trim();
